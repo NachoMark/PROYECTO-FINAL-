@@ -1,0 +1,124 @@
+from random import *
+class Carta:
+    def __init__(self, numero, palo):
+        self.numero = numero
+        self.palo = palo
+    def __repr__(self):
+        return f"{self.numero} de  {self.palo}"
+class ConjuntoDeCartas:
+    def __init__(self):
+        self.conjunto_cartas = []
+        self.conjunto_diccionario = {}
+    def agregarCarta (self, carta): 
+        self.conjunto_cartas.append(carta)
+    def agregarCartas (self, cartas):
+        self.conjunto_cartas.extend(cartas)
+    def agruparCon (self, otroConjuntoDeCartas):
+         nuevoConjunto = ConjuntoDeCartas()
+         nuevoConjunto.agregarCartas (self.conjunto_cartas) 
+         nuevoConjunto.agregarCartas (otroConjuntoDeCartas) 
+         return nuevoConjunto
+    def mezclar_conjunto(self):
+        shuffle(self.conjunto_cartas)
+    def crear_dicc(self):
+        diccionario = {}   
+        for cartas in self.conjunto_cartas:
+            if cartas.numero in diccionario:
+                diccionario[cartas.numero] += 1
+            else:
+                diccionario[cartas.numero] = 1
+        self.conjunto_diccionario = diccionario
+    def buscar_pares (self):
+        if 2 in self.conjunto_diccionario.values():
+            return "hay par"
+        if 3 in self.conjunto_diccionario.values():
+            return "hay trio"
+        if 4 in self.conjunto_diccionario.values():
+            return "hay poker"
+        else: return "no teni nada"
+
+
+          
+        # return self.conjunto_diccionario
+
+class Jugador:
+    def __init__(self,nombre, pozo=0):
+        self.nombre = nombre
+        self.pozo = pozo
+        self.mano = ConjuntoDeCartas()
+        self.mano_final = ConjuntoDeCartas()
+        self.diccionario_mano = {}  
+    def crear_mano_final (self, cartas_mesa):
+        self.mano_final.conjunto_cartas = self.mano.conjunto_cartas + cartas_mesa   
+    def __repr__(self):
+        return f"el jugador es:  {self.nombre}, y su pozo es {self.pozo}"
+    def apostar(self, cantidad_a_apostar):
+        if cantidad_a_apostar<self.pozo or cantidad_a_apostar== self.pozo:
+            self.pozo -=cantidad_a_apostar
+class Jugador:
+    def __init__(self,nombre, pozo=0):
+        self.nombre = nombre
+        self.pozo = pozo
+        self.mano = ConjuntoDeCartas()
+        self.mano_final = ConjuntoDeCartas()
+        self.diccionario_mano = {}  
+    def crear_mano_final (self, cartas_mesa):
+        self.mano_final.conjunto_cartas = self.mano.conjunto_cartas + cartas_mesa   
+    def __repr__(self):
+        return f"el jugador es:  {self.nombre}, y su pozo es {self.pozo}"
+    def apostar(self, cantidad_a_apostar):
+        if cantidad_a_apostar<self.pozo or cantidad_a_apostar== self.pozo:
+            self.pozo -=cantidad_a_apostar
+
+class Juego:
+    def __init__(self):
+        self.lista_jugadores = []
+        self.mesa = ConjuntoDeCartas()
+        self.mazo = ConjuntoDeCartas()
+    
+    def registrar_jugador(self, nombre, pozo):
+        self.lista_jugadores.append(Jugador(nombre, pozo))
+    def crear_mazo(self):
+        contador = 0
+        palos = ["pica", "corazon", "diamante", "trebol"]
+        while contador<4:
+            un_palo = [Carta(x,palos[contador]) for x in range(1,14)]
+            contador+=1
+            self.mazo.agregarCartas(un_palo)
+
+    def Repartir(self):
+        shuffle(self.mazo.conjunto_cartas)
+        cartas_repartidas = 0
+        jugador_a_repartir = 1
+        contador_cartas_mesa = 0
+        for carta in self.mazo.conjunto_cartas:
+            if cartas_repartidas < (len(self.lista_jugadores))*2:
+                self.lista_jugadores[jugador_a_repartir-1].mano.agregarCarta(carta)
+                jugador_a_repartir +=1
+                cartas_repartidas+=1
+                if jugador_a_repartir == len(self.lista_jugadores)+1:
+                    jugador_a_repartir = 1           
+            else:
+                 self.mesa.agregarCarta(carta)
+                 contador_cartas_mesa +=1
+                 if contador_cartas_mesa == 5:
+                    break             
+
+    def preparar_ronda(self):
+        for jugador in self.lista_jugadores:
+            jugador.crear_mano_final(self.mesa.conjunto_cartas)
+        for jugador in self.lista_jugadores:
+            jugador.mano_final.crear_dicc()    
+prueba = Juego()
+prueba.crear_mazo()
+prueba.registrar_jugador("favo", 100)
+prueba.registrar_jugador("nacho",100)
+prueba.Repartir()
+prueba.preparar_ronda()
+
+for x in prueba.lista_jugadores:
+    print(x.mano_final.conjunto_cartas)
+for x in prueba.lista_jugadores:
+    print(x.mano_final.conjunto_diccionario.values())
+for x in prueba.lista_jugadores:
+    print(x.mano_final.buscar_pares())
